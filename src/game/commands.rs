@@ -1,16 +1,17 @@
 use crate::entities::{DigimonEntity, RoomEntity, ItemEntity};
+use colored::*;
 
 pub fn print_valid_commands() {
-    println!("There are a few commands you can use:");
-    println!("1. Attack - Attack the enemy you are facing.");
-    println!("2. Evolve - Evolve your digimon. You can only do this once you have enough experience points.");
-    println!("3. Stats - Print your Digimon's stats.");
-    println!("4. Go <direction> - Move in a direction.");
-    println!("5. Use <item> - Use an item in your inventory.");
-    println!("6. Add <item> - Add an item to your inventory.");
-    println!("7. Inventory - Show your current inventory.");
-    println!("8. Character - Show your character information.");
-    println!("9. Quit - Exit the game.");
+    println!("{}", "There are a few commands you can use:".green());
+    println!("{}", "1. Attack - Attack the enemy you are facing.".blue());
+    println!("{}", "2. Evolve - Evolve your digimon. You can only do this once you have enough experience points.".blue());
+    println!("{}", "3. Stats - Print your Digimon's stats.".blue());
+    println!("{}", "4. Go <direction> - Move in a direction.".blue());
+    println!("{}", "5. Use <item> - Use an item in your inventory.".blue());
+    println!("{}", "6. Add <item> - Add an item to your inventory.".blue());
+    println!("{}", "7. Inventory - Show your current inventory.".blue());
+    println!("{}", "8. Character - Show your character information.".blue());
+    println!("{}", "9. Quit - Exit the game.".blue());
 }
 
 pub fn evolve_digimon(digimon: &mut DigimonEntity) -> bool {
@@ -56,5 +57,3 @@ pub fn use_item(item: &ItemEntity, digimon: &mut DigimonEntity) {
         );
     }
 }
-
-// ... other existing command functions ...
