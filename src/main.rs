@@ -2,6 +2,7 @@ use std::io;
 mod entities;
 mod game;
 
+use colored::*;
 use game::commands;
 use game::setup::{create_character_pairs, create_initial_digimon};
 use game::state::GameState;
@@ -23,21 +24,28 @@ fn main() {
 
         if current_room.has_enemies() {
             if let Some(enemy) = current_room.get_first_enemy() {
-                println!("You see an enemy: {}", enemy.name);
+                println!("{}", format!("You see an enemy: {}", enemy.name).green());
             }
         } else {
-            println!("The room is empty.");
-            println!("You can go in the following directions: ");
+            println!("{}", "The room is empty.".green());
+            println!("{}", "You can go in the following directions: ".green());
+            println!("---------------------------------------------------");
             for direction in current_room.get_available_directions() {
-                println!("{}", direction);
+                println!("{}", direction.blue());
             }
+            println!("---------------------------------------------------");
         }
 
         if current_room.has_items() {
-            println!("You see some items in this room!");
+            println!(
+                "{}",
+                "There is an item in this room. Use the 'pick up' command to collect it.".green()
+            );
+            println!("---------------------------------------------------");
             for item in &current_room.items {
-                println!("- {}", item.name);
+                println!("- {}", item.name.blue());
             }
+            println!("---------------------------------------------------");
         }
 
         let mut input = String::new();
@@ -55,7 +63,7 @@ fn main() {
             "attack" => {
                 let attack_points = game_state.selected_character.attack_points;
                 let current_room = game_state.get_current_room();
-                
+
                 if let Some(enemy) = current_room.get_first_enemy_mut() {
                     if commands::attack_enemy(enemy, attack_points) {
                         println!("You defeated {}!", enemy.name);
@@ -63,12 +71,16 @@ fn main() {
                         game_state.selected_character.add_experience(50);
                     } else {
                         println!(
-                            "You attacked {}. Remaining health: {}",
-                            enemy.name, enemy.health_points
+                            "{}",
+                            format!(
+                                "You attacked {}. Remaining health: {} for {} damage.",
+                                enemy.name, enemy.health_points, attack_points
+                            )
+                            .yellow()
                         );
                     }
                 } else {
-                    println!("There are no enemies to attack.");
+                    println!("{}", "There are no enemies to attack.".red());
                 }
             }
 
@@ -77,7 +89,10 @@ fn main() {
                     println!("Evolving...");
                     if let Some(evolution) = game_state.selected_character.get_next_evolution() {
                         game_state.selected_character = evolution.clone();
-                        println!("Your digimon has evolved into: {}", game_state.selected_character.name);
+                        println!(
+                            "Your digimon has evolved into: {}",
+                            game_state.selected_character.name
+                        );
                     }
                 } else {
                     println!("You do not have enough experience points to evolve.");
@@ -89,7 +104,10 @@ fn main() {
             "pick up" => {
                 let current_room = game_state.get_current_room();
                 if let Some(item) = commands::pick_up_item(current_room) {
-                    println!("You picked up the item: {}", item.name);
+                    println!(
+                        "{}",
+                        format!("You picked up the item: {}", item.name).yellow()
+                    );
                     game_state.add_item_to_inventory(item);
                 } else {
                     println!("There are no items to pick up.");
@@ -102,7 +120,7 @@ fn main() {
                     println!("Invalid command. Please specify an item to use.");
                     continue;
                 }
-                
+
                 let item_name = split_input[1];
                 if game_state.has_item(item_name) {
                     if let Some(item) = game_state.remove_item_from_inventory(item_name) {
@@ -128,7 +146,6 @@ fn main() {
                 {
                     game_state.current_room_key = next_room_key;
                     let next_room = game_state.get_current_room();
-                    println!("You are now in the room: {}", next_room.name);
                     println!("{}", next_room.description);
                     if !next_room.items.is_empty() {
                         println!("You see an item: {}", next_room.items[0].name);
@@ -144,7 +161,6 @@ fn main() {
 
             _ => {
                 println!("Invalid command. Please enter a valid command.");
-                game::print_valid_commands();
             }
         }
     }
