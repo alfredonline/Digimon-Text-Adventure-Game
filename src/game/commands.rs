@@ -33,6 +33,7 @@ pub fn attack_enemy(enemy: &mut DigimonEntity, attack_points: i32) -> bool {
     enemy.health_points == 0
 }
 
+
 pub fn print_stats(digimon: &DigimonEntity) {
     println!("Name: {}", digimon.name);
     println!("Health Points: {}", digimon.health_points);

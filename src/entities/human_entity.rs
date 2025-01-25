@@ -23,7 +23,7 @@ impl HumanEntity {
     }
 
     pub fn remove_from_inventory(&mut self, item_name: &str) -> Option<ItemEntity> {
-        if let Some(pos) = self.inventory.iter().position(|item| item.name == item_name) {
+        if let Some(pos) = self.inventory.iter().position(|item| item.name.to_lowercase() == item_name.to_lowercase()) {
             Some(self.inventory.remove(pos))
         } else {
             None
@@ -31,6 +31,7 @@ impl HumanEntity {
     }
 
     pub fn has_item(&self, item_name: &str) -> bool {
+        println!("{}", item_name);
         self.inventory
             .iter()
             .any(|item| item.name.to_lowercase() == item_name.to_lowercase())
