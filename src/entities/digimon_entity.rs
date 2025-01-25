@@ -6,6 +6,7 @@ pub struct DigimonEntity {
     pub attack_points: i32,
     pub evolutions: Vec<Box<DigimonEntity>>,
     pub experience: i32,
+    pub starting_health: i32
 }
 
 impl DigimonEntity {
@@ -15,6 +16,7 @@ impl DigimonEntity {
         attack_points: i32,
         evolutions: Vec<Box<DigimonEntity>>,
         experience: i32,
+        starting_health: i32
     ) -> DigimonEntity {
         DigimonEntity {
             name: String::from(name),
@@ -22,6 +24,7 @@ impl DigimonEntity {
             attack_points,
             evolutions,
             experience,
+            starting_health
         }
     }
 

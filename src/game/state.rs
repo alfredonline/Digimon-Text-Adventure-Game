@@ -1,4 +1,6 @@
-use crate::entities::{DigimonEntity, HumanEntity, RoomEntity, ItemEntity};
+use colored::Colorize;
+
+use crate::entities::{DigimonEntity, HumanEntity, ItemEntity, RoomEntity};
 use std::collections::HashMap;
 use std::io;
 
@@ -8,21 +10,24 @@ pub struct GameState {
     pub selected_character: Box<DigimonEntity>,
     pub cave_map: HashMap<&'static str, RoomEntity<'static>>,
     pub current_room_key: &'static str,
+    pub game_running: bool
 }
 
 impl GameState {
     pub fn new(
         valid_character_pairs: Vec<HumanEntity>,
         cave_map: HashMap<&'static str, RoomEntity<'static>>,
+        
     ) -> Self {
         let selected_character = valid_character_pairs[0].linked_digimon.clone();
-        
+
         Self {
             valid_character_pairs,
             selected_character_index: 0,
             selected_character,
             cave_map,
-            current_room_key: "Entrance",
+            current_room_key: "Entrance Chamber",
+            game_running: true
         }
     }
 
@@ -30,7 +35,9 @@ impl GameState {
         println!(
             "You are playing (by default) as {} and your digimon is {}",
             self.valid_character_pairs[self.selected_character_index].name,
-            self.valid_character_pairs[self.selected_character_index].linked_digimon.name
+            self.valid_character_pairs[self.selected_character_index]
+                .linked_digimon
+                .name
         );
 
         println!("You can change your character by typing in the name of the character you want to play as.");
@@ -49,17 +56,32 @@ impl GameState {
 
             match input.as_str() {
                 "taichi" => {
-                    println!("You are now playing as Taichi and your digimon is Agumon.");
+                    println!("\n-----------------------------------------------\n");
+                    println!(
+                        "{}",
+                        "You are now playing as Taichi and your digimon is Agumon.".green()
+                    );
+                    println!("\n-----------------------------------------------\n");
                     self.set_selected_character(0);
                     character_selected = true;
                 }
                 "yamato" => {
-                    println!("You are now playing as Yamato and your digimon is Gabumon.");
+                    println!("\n-----------------------------------------------\n");
+                    println!(
+                        "{}",
+                        "You are now playing as Yamato and your digimon is Gabumon.".green()
+                    );
+                    println!("\n-----------------------------------------------\n");
                     self.set_selected_character(1);
                     character_selected = true;
                 }
                 "sora" => {
-                    println!("You are now playing as Sora and your digimon is Garurumon.");
+                    println!("\n-----------------------------------------------\n");
+                    println!(
+                        "{}",
+                        "You are now playing as Sora and your digimon is Garurumon.".green()
+                    );
+                    println!("\n-----------------------------------------------\n");
                     self.set_selected_character(2);
                     character_selected = true;
                 }
@@ -79,7 +101,12 @@ impl GameState {
     }
 
     pub fn get_current_room(&mut self) -> &mut RoomEntity<'static> {
-        self.cave_map.get_mut(self.current_room_key).unwrap()
+        self.cave_map
+            .get_mut(self.current_room_key)
+            .expect(&format!(
+                "Current room key '{}' not found in cave map",
+                self.current_room_key
+            ))
     }
 
     pub fn set_selected_character(&mut self, index: usize) {

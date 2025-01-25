@@ -3,9 +3,10 @@ mod entities;
 mod game;
 
 use colored::*;
-use game::commands;
+use game::commands::{self};
 use game::setup::{create_character_pairs, create_initial_digimon};
 use game::state::GameState;
+use rand::Rng;
 
 fn main() {
     game::load_game();
@@ -19,12 +20,30 @@ fn main() {
 
     game::print_valid_commands();
 
-    loop {
+
+
+    while game_state.game_running {
         let current_room = game_state.get_current_room();
 
         if current_room.has_enemies() {
             if let Some(enemy) = current_room.get_first_enemy() {
-                println!("{}", format!("You see an enemy: {}", enemy.name).green());
+                if enemy.health_points < enemy.starting_health {
+                    println!(
+                        "{} is still alive and has {} health! Keep attacking",
+                        enemy.name, enemy.health_points
+                    );
+                } else {
+                    println!(
+                        "{}",
+                        format!("You see an enemy: {} ({})", enemy.name, enemy.health_points)
+                            .green()
+                    );
+                    println!(
+                        "{}",
+                        format!("You need to delete {} to get to the next room.", enemy.name)
+                            .green()
+                    )
+                }
             }
         } else {
             println!("{}", "The room is empty.".green());
@@ -48,6 +67,7 @@ fn main() {
             println!("---------------------------------------------------");
         }
 
+
         let mut input = String::new();
         io::stdin()
             .read_line(&mut input)
@@ -66,27 +86,76 @@ fn main() {
 
                 if let Some(enemy) = current_room.get_first_enemy_mut() {
                     if commands::attack_enemy(enemy, attack_points) {
-                        println!("You defeated {}!", enemy.name);
+                        println!("{}", format!("You defeated! {}", enemy.name).yellow());
                         current_room.entities.remove(0);
                         game_state.selected_character.add_experience(50);
                     } else {
                         println!(
                             "{}",
-                            format!(
-                                "You attacked {}. Remaining health: {} for {} damage.",
-                                enemy.name, enemy.health_points, attack_points
-                            )
-                            .yellow()
+                            format!("You attacked {} for {} damage.", enemy.name, attack_points)
+                                .yellow()
                         );
+
+                        let mut player_position = 1;
+
+                        println!("{} is preparing an attack. Where do you want to go? Remain, left or right?", enemy.name);
+
+                        loop {
+                            let mut player_digimon_position = String::new();
+                            io::stdin()
+                                .read_line(&mut player_digimon_position)
+                                .expect("Failed to read line");
+
+                            let player_digimon_position = player_digimon_position.trim().to_lowercase();
+
+
+                            match player_digimon_position.as_str() {
+                                "remain" => {
+                                    player_position = 1;
+                                    break;
+                                },
+                                "left" => {
+                                    player_position = 0;
+                                    break;
+                                },
+                                "right" => {
+                                    player_position = 2;
+                                    break;
+                                }
+                                _ => {
+                                    println!("Invalid value. Please enter either remain, left or right.")
+                                }
+                            }
+
+                        
+                        }
+
+                        let random_number = rand::thread_rng().gen_range(0..3);
+
+                        if player_position == random_number {
+                            let damage_to_take = enemy.attack_points;        
+                            game_state.selected_character.subtract_health(damage_to_take);
+                            if game_state.selected_character.health_points == 0 {
+                                println!("{} has been deleted and you have failed the mission!", game_state.selected_character.name);
+                                game_state.game_running = false;
+                            }
+                            println!("You took {} damage!", damage_to_take);
+                        } else {
+                            println!("{} attacked but you dodged the attack.", enemy.name);
+                        }
+
+                        
                     }
                 } else {
                     println!("{}", "There are no enemies to attack.".red());
                 }
             }
 
+
             "evolve" => {
                 if commands::evolve_digimon(&mut game_state.selected_character) {
                     println!("Evolving...");
+                    println!("{} evolution!!!!!!!!!!!!!!!!!!!", game_state.selected_character.name);
                     if let Some(evolution) = game_state.selected_character.get_next_evolution() {
                         game_state.selected_character = evolution.clone();
                         println!(
@@ -115,15 +184,19 @@ fn main() {
             }
 
             input if input.starts_with("use") => {
+                println!("using recovery disk");
                 let split_input: Vec<&str> = input.split_whitespace().collect();
                 if split_input.len() < 2 {
                     println!("Invalid command. Please specify an item to use.");
                     continue;
                 }
 
-                let item_name = split_input[1];
-                if game_state.has_item(item_name) {
-                    if let Some(item) = game_state.remove_item_from_inventory(item_name) {
+
+
+
+                let item_name = split_input[1..].join(" ");
+                if game_state.has_item(&item_name) {
+                    if let Some(item) = game_state.remove_item_from_inventory(&item_name) {
                         commands::use_item(&item, &mut game_state.selected_character);
                     }
                 } else {
