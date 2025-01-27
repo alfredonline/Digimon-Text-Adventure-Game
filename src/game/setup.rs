@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use crate::entities::{DigimonEntity, HumanEntity, RoomEntity, ItemEntity};
 use colored::*;
 
-pub fn create_initial_digimon() -> (Box<DigimonEntity>, Box<DigimonEntity>, Box<DigimonEntity>, Box<DigimonEntity>, Box<DigimonEntity>) {
+pub fn create_initial_digimon() -> (Box<DigimonEntity>, Box<DigimonEntity>, Box<DigimonEntity>, Box<DigimonEntity>, Box<DigimonEntity>,Box<DigimonEntity>, 
+    Box<DigimonEntity>, Box<DigimonEntity>) {
     let metal_greymon = Box::new(DigimonEntity::new(
         String::from("MetalGreymon"),
         300,
@@ -23,11 +24,20 @@ pub fn create_initial_digimon() -> (Box<DigimonEntity>, Box<DigimonEntity>, Box<
 
     let agumon = Box::new(DigimonEntity::new(
         String::from("Agumon"),
-        200,
+        180,
         20,
         vec![greymon.clone()],
         0,
         200
+    ));
+
+    let weregarurumon = Box::new(DigimonEntity::new(
+        String::from("weregarurumon"),
+        300, 
+        100, 
+        vec![],
+        400, 
+        300
     ));
 
     let gabumon = Box::new(DigimonEntity::new(
@@ -39,16 +49,48 @@ pub fn create_initial_digimon() -> (Box<DigimonEntity>, Box<DigimonEntity>, Box<
         180
     ));
 
+
+
     let garurumon = Box::new(DigimonEntity::new(
         String::from("Garurumon"),
         220,
         25,
-        vec![],
+        vec![weregarurumon.clone()],
         100,
         220
     ));
 
-    (metal_greymon, greymon, agumon, gabumon, garurumon)
+    let garudamon = Box::new(DigimonEntity::new(
+        String::from("Garudamon"),
+        300,
+        100,
+        vec![],
+        200,
+        400
+
+    ));
+
+
+
+    let birdramon = Box::new(DigimonEntity::new(
+        String::from("Birdramon"),
+        220, 
+        50,
+        vec![garudamon.clone()],
+        100, 
+        180
+    ));
+
+    let biyomon = Box::new(DigimonEntity::new(
+        String::from("Biyomon"),
+         180,
+        25,
+        vec![birdramon.clone()],
+        0,
+        180
+    ));
+
+    (metal_greymon, greymon, agumon, gabumon, garurumon, biyomon, birdramon, weregarurumon)
 }
 
 pub fn create_character_pairs(agumon: Box<DigimonEntity>, gabumon: Box<DigimonEntity>, garurumon: Box<DigimonEntity>) -> Vec<HumanEntity> {
@@ -140,22 +182,15 @@ pub fn setup_map() -> HashMap<&'static str, RoomEntity<'static>> {
         100,
     );
 
-    let power_chip = ItemEntity::new(
-        String::from("Power Chip"),
-        String::from("A rare chip that temporarily boosts a Digimon's attack power."),
-        true,
-        50,
-    );
 
     let defense_module = ItemEntity::new(
         String::from("Defense Module"),
-        String::from("A device that increases a Digimon's defense."),
+        String::from("A device that increases a Digimon's health."),
         true,
         50,
     );
 
     // Add items to rooms
-    weapons_storage.add_item(power_chip);
     hidden_armory.add_item(defense_module);
     training_ground.add_item(healing_disk);
 
