@@ -11,7 +11,8 @@ use rand::Rng;
 fn main() {
     game::load_game();
 
-    let (_metal_greymon, _greymon, agumon, gabumon, garurumon) = create_initial_digimon();
+    let (_metal_greymon, _greymon, agumon, gabumon, garurumon,
+    _weregarurumon, _piyomon, _birdramon) = create_initial_digimon();
     let valid_character_pairs = create_character_pairs(agumon, gabumon, garurumon);
     let cave_map = game::setup_map();
 
@@ -184,7 +185,6 @@ fn main() {
             }
 
             input if input.starts_with("use") => {
-                println!("using recovery disk");
                 let split_input: Vec<&str> = input.split_whitespace().collect();
                 if split_input.len() < 2 {
                     println!("Invalid command. Please specify an item to use.");
